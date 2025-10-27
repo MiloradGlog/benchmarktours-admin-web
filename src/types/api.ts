@@ -25,7 +25,7 @@ export interface Tour {
   updated_at: string;
 }
 
-export type ActivityType = 'CompanyVisit' | 'Hotel' | 'Restaurant' | 'Travel';
+export type ActivityType = 'CompanyVisit' | 'Hotel' | 'Restaurant' | 'Travel' | 'Discussion';
 
 export interface Activity {
   id: number;
@@ -40,6 +40,7 @@ export interface Activity {
   location_details?: string;
   survey_url?: string;
   image_url?: string;
+  linked_activity_id?: number; // For Discussion activities to link to other activities
   created_at: string;
   updated_at: string;
   // Rating fields
@@ -202,6 +203,7 @@ export interface CreateActivityData {
   end_time: string;
   location_details?: string;
   survey_url?: string;
+  linked_activity_id?: number; // For Discussion activities
 }
 
 export interface User {
@@ -218,4 +220,57 @@ export interface TourParticipant {
   user_id: string;
   assigned_at: string;
   user: User;
+}
+
+// Discussion Activity Types
+export interface DiscussionTeam {
+  id: number;
+  discussion_activity_id: number;
+  name: string;
+  description?: string;
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiscussionTeamMember {
+  id: number;
+  team_id: number;
+  user_id: string;
+  is_presenter: boolean;
+  joined_at: string;
+  user_first_name?: string;
+  user_last_name?: string;
+  user_email?: string;
+}
+
+export interface DiscussionQuestion {
+  id: number;
+  discussion_activity_id: number;
+  question_text: string;
+  order_index: number;
+  is_required: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiscussionTeamNote {
+  id: number;
+  team_id: number;
+  question_id?: number;
+  content: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  question_text?: string;
+  author_name?: string;
+}
+
+export interface DiscussionActivityDetails {
+  activity_id: number;
+  teams: Array<DiscussionTeam & {
+    members: DiscussionTeamMember[];
+    notes: DiscussionTeamNote[];
+  }>;
+  questions: DiscussionQuestion[];
 }

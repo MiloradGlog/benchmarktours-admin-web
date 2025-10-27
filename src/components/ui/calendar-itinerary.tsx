@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Building2, Hotel, Utensils, Car, MapPin, Clock } from 'lucide-react';
+import { Building2, Hotel, Utensils, Car, MapPin, Clock, MessageSquare } from 'lucide-react';
 import { toDateTimeLocalValue, fromDateTimeLocalValue, utcToJSTString, jstDateToUTC } from '@/utils/time';
 
 interface CalendarItineraryProps {
@@ -50,6 +50,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
     location_details: '',
     company_id: '',
     survey_url: '',
+    linked_activity_id: '',
   });
 
   // Convert activities to calendar events
@@ -78,6 +79,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
       case 'Hotel': return '#10b981'; // Green
       case 'Restaurant': return '#f59e0b'; // Yellow
       case 'Travel': return '#8b5cf6'; // Purple
+      case 'Discussion': return '#ec4899'; // Pink
       default: return '#6b7280'; // Gray
     }
   }
@@ -88,6 +90,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
       case 'Hotel': return Hotel;
       case 'Restaurant': return Utensils;
       case 'Travel': return Car;
+      case 'Discussion': return MessageSquare;
       default: return Clock;
     }
   }
@@ -108,6 +111,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
       location_details: '',
       company_id: '',
       survey_url: '',
+      linked_activity_id: '',
     });
     setIsDialogOpen(true);
 
@@ -129,6 +133,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
       location_details: activity.location_details || '',
       company_id: activity.company_id?.toString() || '',
       survey_url: activity.survey_url || '',
+      linked_activity_id: activity.linked_activity_id?.toString() || '',
     });
     setIsDialogOpen(true);
   };
@@ -175,11 +180,12 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const activityData: CreateActivityData = {
         ...formData,
         company_id: formData.company_id ? parseInt(formData.company_id) : undefined,
+        linked_activity_id: formData.linked_activity_id ? parseInt(formData.linked_activity_id) : undefined,
       };
 
       if (editingActivity) {
@@ -187,7 +193,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
       } else {
         await onActivityCreate(activityData);
       }
-      
+
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
@@ -219,6 +225,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
       location_details: '',
       company_id: '',
       survey_url: '',
+      linked_activity_id: '',
     });
     setEditingActivity(null);
     setSelectedDateRange(null);
@@ -299,6 +306,7 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="CompanyVisit">Company Visit</SelectItem>
+                  <SelectItem value="Discussion">Discussion</SelectItem>
                   <SelectItem value="Hotel">Hotel</SelectItem>
                   <SelectItem value="Restaurant">Restaurant</SelectItem>
                   <SelectItem value="Travel">Travel</SelectItem>
@@ -309,8 +317,8 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
             {formData.type === 'CompanyVisit' && (
               <div className="space-y-2">
                 <Label htmlFor="company">Company</Label>
-                <Select 
-                  value={formData.company_id} 
+                <Select
+                  value={formData.company_id}
                   onValueChange={(value) => setFormData({ ...formData, company_id: value })}
                 >
                   <SelectTrigger>
@@ -326,7 +334,34 @@ export const CalendarItinerary: React.FC<CalendarItineraryProps> = ({
                 </Select>
               </div>
             )}
-            
+
+            {formData.type === 'Discussion' && (
+              <div className="space-y-2">
+                <Label htmlFor="linked_activity">Linked Activity (Optional)</Label>
+                <Select
+                  value={formData.linked_activity_id || 'none'}
+                  onValueChange={(value) => setFormData({ ...formData, linked_activity_id: value === 'none' ? '' : value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select activity to link (e.g., Company Visit)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (Standalone)</SelectItem>
+                    {activities
+                      .filter(a => a.type === 'CompanyVisit')
+                      .map((activity) => (
+                        <SelectItem key={activity.id} value={activity.id.toString()}>
+                          {activity.title}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Link this discussion to a company visit for Daily Discussions, or leave as None for Orientation/Wrap-up sessions.
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
               <Input
