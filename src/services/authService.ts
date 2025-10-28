@@ -1,9 +1,14 @@
 import api from './api';
-import { LoginCredentials, RegisterData, AuthResponse, User } from '@/types/auth';
+import { LoginCredentials, RegisterData, AuthResponse, User, SetupAccountData } from '@/types/auth';
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post('/auth/login', credentials);
+    return response.data;
+  },
+
+  setupAccount: async (data: SetupAccountData): Promise<AuthResponse> => {
+    const response = await api.post('/auth/setup-account', data);
     return response.data;
   },
 

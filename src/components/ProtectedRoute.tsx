@@ -7,11 +7,11 @@ interface ProtectedRouteProps {
   requireAdmin?: boolean;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requireAdmin = false 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requireAdmin = false
 }) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, needsPasswordSetup } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -24,6 +24,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check if user needs to complete password setup
+  if (needsPasswordSetup && location.pathname !== '/admin-setup') {
+    return <Navigate to="/admin-setup" state={{ from: location }} replace />;
   }
 
   if (requireAdmin && user?.role !== 'Admin') {

@@ -1,5 +1,5 @@
 import api from './api';
-import { User, CreateUserData, UpdateUserData, UserStats, ApiResponse } from '@/types/auth';
+import { User, CreateUserData, UpdateUserData, UserStats, ApiResponse, CreateUserResponse } from '@/types/auth';
 
 export const userService = {
   // Get all users
@@ -15,9 +15,12 @@ export const userService = {
   },
 
   // Create new user
-  createUser: async (userData: CreateUserData): Promise<User> => {
+  createUser: async (userData: CreateUserData): Promise<CreateUserResponse> => {
     const response = await api.post('/users', userData);
-    return response.data.user;
+    return {
+      user: response.data.user,
+      setup_code: response.data.setup_code
+    };
   },
 
   // Update user

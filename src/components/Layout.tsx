@@ -2,16 +2,17 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { 
-  Building2, 
-  MapPin, 
-  Users, 
-  LogOut, 
+import {
+  Building2,
+  MapPin,
+  Users,
+  LogOut,
   BarChart3,
   Menu,
   X,
   Star,
-  ClipboardList
+  ClipboardList,
+  KeyRound
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -24,6 +25,7 @@ export const Layout: React.FC = () => {
     { name: 'Companies', href: '/companies', icon: Building2 },
     { name: 'Tours', href: '/tours', icon: MapPin },
     { name: 'Users', href: '/users', icon: Users },
+    { name: 'Password Resets', href: '/password-resets', icon: KeyRound },
     { name: 'Reviews', href: '/reviews', icon: Star },
     { name: 'Surveys', href: '/surveys', icon: ClipboardList },
   ];

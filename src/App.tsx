@@ -17,6 +17,8 @@ import { SurveyBuilderPage } from '@/pages/SurveyBuilderPage';
 import { SurveyViewPage } from '@/pages/SurveyViewPage';
 import { SurveyResponsesPage } from '@/pages/SurveyResponsesPage';
 import { PublicSurveyPage } from '@/pages/PublicSurveyPage';
+import { PasswordResetRequestsPage } from '@/pages/PasswordResetRequestsPage';
+import { AdminSetupPage } from '@/pages/AdminSetupPage';
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin-setup" element={<AdminSetupPage />} />
           <Route path="/public/survey/:token" element={<PublicSurveyPage />} />
           <Route
             path="/*"
@@ -40,6 +43,7 @@ function App() {
             <Route path="tours/:tourId/itinerary" element={<TourItineraryPage />} />
             <Route path="tours/:tourId/participants" element={<TourParticipantsPage />} />
             <Route path="users" element={<UsersPage />} />
+            <Route path="password-resets" element={<PasswordResetRequestsPage />} />
             <Route path="reviews" element={<ReviewsPage />} />
             <Route path="surveys" element={<SurveysPage />} />
             <Route path="surveys/create" element={<SurveyBuilderPage />} />

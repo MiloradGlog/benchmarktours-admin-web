@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  needsPasswordSetup: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -28,6 +29,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false);
 
   const checkAuth = async () => {
     try {
@@ -35,6 +37,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userData = authService.getUser();
         if (userData) {
           setUser(userData);
+          // Check if user needs password setup
+          const needsSetup = !userData.password_set_at;
+          setNeedsPasswordSetup(needsSetup);
           // Verify token is still valid
           await authService.getMe();
         } else {
@@ -45,6 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Auth check failed:', error);
       authService.logout();
       setUser(null);
+      setNeedsPasswordSetup(false);
     } finally {
       setIsLoading(false);
     }
@@ -54,11 +60,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const response = await authService.login({ email, password });
     authService.setAuthData(response.token, response.user);
     setUser(response.user);
+    // Check if user needs password setup
+    const needsSetup = !response.user.password_set_at;
+    setNeedsPasswordSetup(needsSetup);
   };
 
   const logout = () => {
     authService.logout();
     setUser(null);
+    setNeedsPasswordSetup(false);
   };
 
   useEffect(() => {
@@ -69,6 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated: !!user,
     isLoading,
+    needsPasswordSetup,
     login,
     logout,
     checkAuth,

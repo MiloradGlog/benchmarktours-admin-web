@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const [needsSetup, setNeedsSetup] = useState(false);
+
   const { login, isAuthenticated } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   
   const from = location.state?.from?.pathname || '/dashboard';
 
@@ -25,18 +29,30 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setNeedsSetup(false);
 
     try {
       await login(email, password);
     } catch (error: any) {
       console.error('Login failed:', error);
-      setError(
-        error.response?.data?.error || 
-        'Login failed. Please check your credentials.'
-      );
+
+      // Check if user needs password setup
+      if (error.response?.data?.error === 'PASSWORD_NOT_SET') {
+        setNeedsSetup(true);
+        setError('Your account has not been set up yet. Please use your setup code to complete account setup.');
+      } else {
+        setError(
+          error.response?.data?.error ||
+          'Login failed. Please check your credentials.'
+        );
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoToSetup = () => {
+    navigate('/admin-setup');
   };
 
   return (
@@ -51,9 +67,24 @@ export const LoginPage: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                {error}
-              </div>
+              <Alert variant={needsSetup ? "default" : "destructive"}>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {error}
+                  {needsSetup && (
+                    <div className="mt-2">
+                      <Button
+                        type="button"
+                        onClick={handleGoToSetup}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Complete Account Setup
+                      </Button>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
             )}
             
             <div className="space-y-2">
