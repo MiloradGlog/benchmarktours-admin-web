@@ -39,7 +39,7 @@ export const TourDetailsPage: React.FC = () => {
   });
 
   const [themeMode, setThemeMode] = useState<'default' | 'custom'>('default');
-  const [themePrimaryColor, setThemePrimaryColor] = useState('#2563eb');
+  const [themePrimaryColor, setThemePrimaryColor] = useState('#497CED');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -82,7 +82,7 @@ export const TourDetailsPage: React.FC = () => {
         survey_url: tourData.survey_url || '',
       });
 
-      if (tourData.theme_primary_color && tourData.theme_primary_color !== '#2563eb') {
+      if (tourData.theme_primary_color && tourData.theme_primary_color !== '#497CED') {
         setThemeMode('custom');
         setThemePrimaryColor(tourData.theme_primary_color);
       }
@@ -109,7 +109,7 @@ export const TourDetailsPage: React.FC = () => {
     try {
       const updateData: any = {
         ...formData,
-        theme_primary_color: themeMode === 'custom' ? themePrimaryColor : '#2563eb',
+        theme_primary_color: themeMode === 'custom' ? themePrimaryColor : '#497CED',
       };
 
       if (themeMode === 'default') {
@@ -576,7 +576,7 @@ export const TourDetailsPage: React.FC = () => {
                         type="text"
                         value={themePrimaryColor}
                         onChange={(e) => setThemePrimaryColor(e.target.value)}
-                        placeholder="#2563eb"
+                        placeholder="#497CED"
                         className="flex-1"
                       />
                     </div>

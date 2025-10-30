@@ -32,7 +32,7 @@ export const ToursPage: React.FC = () => {
     end_date: '',
     status: 'Draft' as TourStatus,
     survey_url: '',
-    theme_primary_color: '#2563eb',
+    theme_primary_color: '#497CED',
     theme_logo_url: '',
     theme_company_id: '',
   });
@@ -132,13 +132,13 @@ export const ToursPage: React.FC = () => {
       end_date: toDateValue(tour.end_date),
       status: tour.status,
       survey_url: tour.survey_url || '',
-      theme_primary_color: tour.theme_primary_color || '#2563eb',
+      theme_primary_color: tour.theme_primary_color || '#497CED',
       theme_logo_url: tour.theme_logo_url || '',
       theme_company_id: tour.theme_company_id?.toString() || '',
     });
     setLogoPreview(tour.theme_logo_url || null);
     setLogoFile(null);
-    if (tour.theme_logo_url || tour.theme_primary_color !== '#2563eb') {
+    if (tour.theme_logo_url || tour.theme_primary_color !== '#497CED') {
       setThemeMode('custom');
     } else {
       setThemeMode('default');
@@ -217,7 +217,7 @@ export const ToursPage: React.FC = () => {
       end_date: '',
       status: 'Draft' as TourStatus,
       survey_url: '',
-      theme_primary_color: '#2563eb',
+      theme_primary_color: '#497CED',
       theme_logo_url: '',
       theme_company_id: '',
     });
@@ -401,7 +401,7 @@ export const ToursPage: React.FC = () => {
                   <Select value={themeMode} onValueChange={(value: 'default' | 'custom') => {
                     setThemeMode(value);
                     if (value === 'default') {
-                      setFormData({ ...formData, theme_primary_color: '#2563eb', theme_company_id: '', theme_logo_url: '' });
+                      setFormData({ ...formData, theme_primary_color: '#497CED', theme_company_id: '', theme_logo_url: '' });
                       setLogoPreview(null);
                       setLogoFile(null);
                     }
@@ -432,7 +432,7 @@ export const ToursPage: React.FC = () => {
                         value={formData.theme_primary_color}
                         onChange={(e) => setFormData({ ...formData, theme_primary_color: e.target.value })}
                         className="flex-1"
-                        placeholder="#2563eb"
+                        placeholder="#497CED"
                       />
                     </div>
                   </div>
