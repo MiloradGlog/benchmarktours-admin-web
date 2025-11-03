@@ -19,6 +19,8 @@ import { SurveyResponsesPage } from '@/pages/SurveyResponsesPage';
 import { PublicSurveyPage } from '@/pages/PublicSurveyPage';
 import { PasswordResetRequestsPage } from '@/pages/PasswordResetRequestsPage';
 import { AdminSetupPage } from '@/pages/AdminSetupPage';
+import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
+import { TermsOfServicePage } from '@/pages/TermsOfServicePage';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-setup" element={<AdminSetupPage />} />
           <Route path="/public/survey/:token" element={<PublicSurveyPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
           <Route
             path="/*"
             element={
