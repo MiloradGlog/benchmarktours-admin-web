@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus, Save, Eye, Trash2, GripVertical, X, Copy } from 'lucide-react';
 import { surveyService } from '../services/surveyService';
 import { tourService } from '../services/tourService';
-import { Survey, SurveyQuestion, CreateQuestionData, SurveyType, QuestionType, Tour, SurveyTemplate } from '../types/api';
+import { activityService } from '../services/activityService';
+import { Survey, SurveyQuestion, CreateQuestionData, SurveyType, QuestionType, Tour, SurveyTemplate, Activity } from '../types/api';
 
 interface SurveyBuilderPageProps {}
 
@@ -32,6 +33,12 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
   const [templates, setTemplates] = useState<SurveyTemplate[]>([]);
   const [tours, setTours] = useState<Tour[]>([]);
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(null);
+  const [isLoadingSurvey, setIsLoadingSurvey] = useState(false);
+
+  // Track previous tour ID to detect actual changes (not initial loads)
+  const prevTourIdRef = useRef<number | null>(null);
 
   // Question form state
   const [questionForm, setQuestionForm] = useState<CreateQuestionData>({
@@ -49,10 +56,25 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
     }
     loadTemplates();
     loadTours();
+    loadActivities();
   }, [id, isEditing]);
+
+  // Clear activity selection when tour changes for ACTIVITY_FEEDBACK type
+  // Only clear when tour actually changes (not during initial load)
+  useEffect(() => {
+    if (type === 'ACTIVITY_FEEDBACK' && !isLoadingSurvey) {
+      // Only clear if tour ID actually changed (not just set during load)
+      if (prevTourIdRef.current !== null && prevTourIdRef.current !== selectedTourId) {
+        setSelectedActivityId(null);
+      }
+    }
+    // Update ref to track current value for next change
+    prevTourIdRef.current = selectedTourId;
+  }, [selectedTourId, type, isLoadingSurvey]);
 
   const loadSurvey = async (surveyId: number) => {
     setIsLoading(true);
+    setIsLoadingSurvey(true);
     try {
       const surveyData = await surveyService.getSurveyById(surveyId);
       setSurvey(surveyData);
@@ -60,10 +82,23 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
       setDescription(surveyData.description || '');
       setType(surveyData.type);
       setQuestions(surveyData.questions || []);
+      setSelectedTourId(surveyData.tour_id || null);
+      setSelectedActivityId(surveyData.activity_id || null);
+
+      // For ACTIVITY_FEEDBACK surveys, if we have an activity_id but no tour_id,
+      // we need to find the tour from the activity
+      if (surveyData.type === 'ACTIVITY_FEEDBACK' && surveyData.activity_id && !surveyData.tour_id) {
+        const response = await activityService.getAllActivities();
+        const activity = response.activities.find((a: any) => a.id === surveyData.activity_id);
+        if (activity) {
+          setSelectedTourId(activity.tour_id);
+        }
+      }
     } catch (error) {
       console.error('Error loading survey:', error);
     } finally {
       setIsLoading(false);
+      setIsLoadingSurvey(false);
     }
   };
 
@@ -85,19 +120,59 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
     }
   };
 
+  const loadActivities = async () => {
+    try {
+      const response = await activityService.getAllActivities();
+      setActivities(response.activities);
+    } catch (error) {
+      console.error('Error loading activities:', error);
+    }
+  };
+
   const handleSave = async () => {
+    console.log('=== HANDLE SAVE STARTED ===');
+    console.log('Title:', title);
+    console.log('Type:', type);
+    console.log('Selected Tour ID:', selectedTourId);
+    console.log('Selected Activity ID:', selectedActivityId);
+
     if (!title.trim()) {
+      console.log('VALIDATION FAILED: No title');
       alert('Please enter a survey title');
       return;
     }
 
+    // Validate mandatory tour connection for TOUR_COMPLETION
+    if (type === 'TOUR_COMPLETION' && !selectedTourId) {
+      console.log('VALIDATION FAILED: TOUR_COMPLETION needs tour');
+      alert('Please select a tour for Tour Completion surveys');
+      return;
+    }
+
+    // Validate mandatory connections for ACTIVITY_FEEDBACK
+    if (type === 'ACTIVITY_FEEDBACK') {
+      if (!selectedTourId) {
+        console.log('VALIDATION FAILED: ACTIVITY_FEEDBACK needs tour');
+        alert('Please select a tour first for Activity Feedback surveys');
+        return;
+      }
+      if (!selectedActivityId) {
+        console.log('VALIDATION FAILED: ACTIVITY_FEEDBACK needs activity');
+        alert('Please select an activity for Activity Feedback surveys');
+        return;
+      }
+    }
+
+    console.log('Validation passed, preparing survey data...');
+
     setIsSaving(true);
     try {
-      const surveyData = {
+      // Build survey data based on type to respect database constraint
+      // (survey can have tour_id OR activity_id, but not both)
+      const surveyData: any = {
         title: title.trim(),
         description: description.trim() || undefined,
         type,
-        tour_id: selectedTourId || undefined,
         questions: questions.map((q, index) => ({
           question_text: q.question_text,
           question_type: q.question_type,
@@ -113,18 +188,45 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
         })),
       };
 
-      if (isEditing && survey) {
-        await surveyService.updateSurvey(survey.id, surveyData);
+      // Add appropriate link based on survey type
+      // Database constraint: survey can have tour_id OR activity_id, but not both
+      if (type === 'ACTIVITY_FEEDBACK') {
+        // For activity feedback, only save activity_id and explicitly clear tour_id
+        surveyData.activity_id = selectedActivityId || undefined;
+        surveyData.tour_id = null;
+        console.log('ACTIVITY_FEEDBACK: Set activity_id =', surveyData.activity_id, ', tour_id = null');
+      } else if (type === 'TOUR_COMPLETION' || type === 'TOUR_APPLICATION') {
+        // For tour-related surveys, only save tour_id and explicitly clear activity_id
+        surveyData.tour_id = selectedTourId || undefined;
+        surveyData.activity_id = null;
+        console.log('TOUR survey: Set tour_id =', surveyData.tour_id, ', activity_id = null');
       } else {
-        await surveyService.createSurvey(surveyData);
+        // For CUSTOM surveys, clear both links
+        surveyData.tour_id = null;
+        surveyData.activity_id = null;
+        console.log('CUSTOM: Both tour_id and activity_id = null');
       }
 
+      console.log('Final surveyData:', surveyData);
+
+      if (isEditing && survey) {
+        console.log('Updating survey ID:', survey.id);
+        await surveyService.updateSurvey(survey.id, surveyData);
+        console.log('Update successful');
+      } else {
+        console.log('Creating new survey');
+        await surveyService.createSurvey(surveyData);
+        console.log('Create successful');
+      }
+
+      console.log('Navigating to /surveys');
       navigate('/surveys');
     } catch (error) {
       console.error('Error saving survey:', error);
       alert('Failed to save survey. Please try again.');
     } finally {
       setIsSaving(false);
+      console.log('=== HANDLE SAVE ENDED ===');
     }
   };
 
@@ -445,13 +547,18 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
 
           {(type === 'TOUR_APPLICATION' || type === 'TOUR_COMPLETION') && (
             <div className="space-y-2">
-              <Label htmlFor="tourId">Link to Tour (Optional)</Label>
-              <Select value={selectedTourId?.toString() || ''} onValueChange={(value) => setSelectedTourId(value ? parseInt(value) : null)}>
+              <Label htmlFor="tourId">
+                Link to Tour {type === 'TOUR_COMPLETION' ? '*' : '(Optional)'}
+              </Label>
+              <Select
+                value={selectedTourId?.toString() || ''}
+                onValueChange={(value) => setSelectedTourId(value && value !== 'none' ? parseInt(value) : null)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a tour" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No specific tour</SelectItem>
+                  {type === 'TOUR_APPLICATION' && <SelectItem value="none">No specific tour</SelectItem>}
                   {tours.map((tour) => (
                     <SelectItem key={tour.id} value={tour.id.toString()}>
                       {tour.name}
@@ -460,6 +567,50 @@ export const SurveyBuilderPage: React.FC<SurveyBuilderPageProps> = () => {
                 </SelectContent>
               </Select>
             </div>
+          )}
+
+          {type === 'ACTIVITY_FEEDBACK' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="tourId">Link to Tour *</Label>
+                <Select
+                  value={selectedTourId?.toString() || ''}
+                  onValueChange={(value) => setSelectedTourId(value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a tour first" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tours.map((tour) => (
+                      <SelectItem key={tour.id} value={tour.id.toString()}>
+                        {tour.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="activityId">Link to Activity *</Label>
+                <Select
+                  value={selectedActivityId?.toString() || ''}
+                  onValueChange={(value) => setSelectedActivityId(value ? parseInt(value) : null)}
+                  disabled={!selectedTourId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={selectedTourId ? "Select an activity" : "Select a tour first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activities
+                      .filter((activity) => activity.tour_id === selectedTourId)
+                      .map((activity) => (
+                        <SelectItem key={activity.id} value={activity.id.toString()}>
+                          {activity.title} {activity.company_name && `- ${activity.company_name}`}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

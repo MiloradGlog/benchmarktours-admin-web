@@ -27,8 +27,16 @@ export const surveyService = {
   },
 
   updateSurvey: async (id: number, updateData: Partial<Survey>): Promise<Survey> => {
-    const response = await api.put(`/surveys/${id}`, updateData);
-    return response.data;
+    console.log('[surveyService] updateSurvey called with id:', id);
+    console.log('[surveyService] updateData:', updateData);
+    try {
+      const response = await api.put(`/surveys/${id}`, updateData);
+      console.log('[surveyService] Response received:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[surveyService] Error in updateSurvey:', error);
+      throw error;
+    }
   },
 
   deleteSurvey: async (id: number): Promise<void> => {
