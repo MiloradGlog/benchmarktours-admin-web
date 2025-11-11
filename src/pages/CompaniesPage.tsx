@@ -344,7 +344,7 @@ export const CompaniesPage: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-2">{company.address}</p>
               )}
               {company.description && (
-                <p className="text-sm text-gray-700">{company.description}</p>
+                <p className="text-sm text-gray-700 line-clamp-5">{company.description}</p>
               )}
             </CardContent>
           </Card>
