@@ -91,8 +91,13 @@ interface SidebarContentProps {
 
 const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, location, onLogout, user }) => (
   <>
-    <div className="flex items-center h-16 flex-shrink-0 px-4 bg-primary">
-      <h1 className="text-xl font-bold text-white">Benchmark Tours</h1>
+    <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 bg-white border-b border-gray-200">
+      <img
+        src="/makoto-logo.png"
+        alt="Makoto"
+        className="h-12 w-auto"
+      />
+      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Admin Panel</span>
     </div>
     <div className="flex-1 flex flex-col overflow-y-auto">
       <nav className="flex-1 px-2 py-4 bg-white space-y-1">
