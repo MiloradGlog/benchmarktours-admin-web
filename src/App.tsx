@@ -17,11 +17,12 @@ import { SurveyBuilderPage } from '@/pages/SurveyBuilderPage';
 import { SurveyViewPage } from '@/pages/SurveyViewPage';
 import { SurveyResponsesPage } from '@/pages/SurveyResponsesPage';
 import { PublicSurveyPage } from '@/pages/PublicSurveyPage';
-import { PasswordResetRequestsPage } from '@/pages/PasswordResetRequestsPage';
+import { AccountRequestsPage } from '@/pages/AccountRequestsPage';
 import { AdminSetupPage } from '@/pages/AdminSetupPage';
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from '@/pages/TermsOfServicePage';
 import { SupportPage } from '@/pages/SupportPage';
+import { AccountDeletionRequestPage } from '@/pages/AccountDeletionRequestPage';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
           <Route path="/support" element={<SupportPage />} />
+          <Route path="/request-account-deletion" element={<AccountDeletionRequestPage />} />
           <Route
             path="/*"
             element={
@@ -49,7 +51,7 @@ function App() {
             <Route path="tours/:tourId/itinerary" element={<TourItineraryPage />} />
             <Route path="tours/:tourId/participants" element={<TourParticipantsPage />} />
             <Route path="users" element={<UsersPage />} />
-            <Route path="password-resets" element={<PasswordResetRequestsPage />} />
+            <Route path="account-requests" element={<AccountRequestsPage />} />
             <Route path="reviews" element={<ReviewsPage />} />
             <Route path="surveys" element={<SurveysPage />} />
             <Route path="surveys/create" element={<SurveyBuilderPage />} />

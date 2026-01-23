@@ -12,7 +12,7 @@ import {
   X,
   Star,
   ClipboardList,
-  KeyRound
+  UserCog
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -25,7 +25,7 @@ export const Layout: React.FC = () => {
     { name: 'Companies', href: '/companies', icon: Building2 },
     { name: 'Tours', href: '/tours', icon: MapPin },
     { name: 'Users', href: '/users', icon: Users },
-    { name: 'Password Resets', href: '/password-resets', icon: KeyRound },
+    { name: 'Account Requests', href: '/account-requests', icon: UserCog },
     { name: 'Reviews', href: '/reviews', icon: Star },
     { name: 'Surveys', href: '/surveys', icon: ClipboardList },
   ];
