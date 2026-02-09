@@ -12,6 +12,7 @@ import { reviewService } from '@/services/reviewService';
 import { Tour, TourStatus } from '@/types/api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toDateValue, fromDateValue, formatDateJST } from '@/utils/time';
+import { AIFloatingChat } from '@/components/AIChat/AIFloatingChat';
 
 export const ToursPage: React.FC = () => {
   const [tours, setTours] = useState<Tour[]>([]);
@@ -25,6 +26,7 @@ export const ToursPage: React.FC = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedTourForAI, setSelectedTourForAI] = useState<Tour | undefined>(undefined);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -279,7 +281,7 @@ export const ToursPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Tours</h1>
           <p className="mt-2 text-gray-600">
-            Manage benchmarking tours and their schedules.
+            Manage benchmarking tours and their schedules. Click on a tour to use AI assistant for schedule management.
           </p>
           
           <div className="mt-4 flex space-x-4">
@@ -509,8 +511,15 @@ export const ToursPage: React.FC = () => {
         {filteredTours.map((tour) => {
           const statusColor = getStatusColor(tour.status);
           const rating = tourRatings[tour.id];
+          const isSelectedForAI = selectedTourForAI?.id === tour.id;
           return (
-            <Card key={tour.id}>
+            <Card
+              key={tour.id}
+              className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                isSelectedForAI ? 'ring-2 ring-purple-500 shadow-lg' : ''
+              }`}
+              onClick={() => setSelectedTourForAI(tour)}
+            >
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-2">
@@ -562,7 +571,10 @@ export const ToursPage: React.FC = () => {
                     <div className="flex justify-center">
                       <Button
                         size="sm"
-                        onClick={() => handleStatusTransition(tour, getNextStatus(tour.status)!)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusTransition(tour, getNextStatus(tour.status)!);
+                        }}
                         className="w-full"
                       >
                         <ArrowRight className="h-4 w-4 mr-1" />
@@ -576,14 +588,20 @@ export const ToursPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleEdit(tour)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(tour);
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(tour.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(tour.id);
+                        }}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -610,6 +628,12 @@ export const ToursPage: React.FC = () => {
           <p className="mt-2 text-gray-500">Get started by creating your first tour.</p>
         </div>
       )}
+
+      {/* AI Chat Assistant */}
+      <AIFloatingChat
+        selectedTour={selectedTourForAI}
+        onTourChange={fetchTours}
+      />
     </div>
   );
 };

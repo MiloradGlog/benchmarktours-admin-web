@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CalendarItinerary } from '@/components/ui/calendar-itinerary';
-import { ArrowLeft, Calendar, Users, Palette, FileText, Plus, Trash2, Search, Download, Upload, X } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Palette, FileText, Plus, Trash2, Search, Download, Upload, X, Bot } from 'lucide-react';
 import { tourService, userService } from '@/services/tourService';
 import { companyService } from '@/services/companyService';
 import { Tour, Activity, Company, CreateActivityData, User, TourParticipant, TourStatus } from '@/types/api';
+import { AIChat } from '@/components/AIChat/AIChat';
 
 export const TourDetailsPage: React.FC = () => {
   const { tourId } = useParams<{ tourId: string }>();
@@ -28,6 +29,7 @@ export const TourDetailsPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -161,6 +163,12 @@ export const TourDetailsPage: React.FC = () => {
     setActivities(activitiesResponse.activities);
   };
 
+  const handleScheduleUpdate = async () => {
+    if (!tourId) return;
+    const activitiesResponse = await tourService.getActivities(parseInt(tourId));
+    setActivities(activitiesResponse.activities);
+  };
+
   const handleAssignUser = async (userId: string) => {
     if (!tourId) return;
 
@@ -288,9 +296,37 @@ export const TourDetailsPage: React.FC = () => {
             <p className="text-gray-600">Manage all aspects of this tour</p>
           </div>
         </div>
+
+        {/* AI Chat Toggle */}
+        <Button
+          variant={isChatOpen ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setIsChatOpen(!isChatOpen)}
+        >
+          {isChatOpen ? (
+            <>
+              <X className="h-4 w-4 mr-2" />
+              Close AI Assistant
+            </>
+          ) : (
+            <>
+              <Bot className="h-4 w-4 mr-2" />
+              AI Assistant
+            </>
+          )}
+        </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      {/* Main Content Area with Sidebar */}
+      <div className="flex gap-6">
+        {/* Content Area */}
+        <div
+          className="flex-1 transition-all duration-300 ease-in-out"
+          style={{
+            width: isChatOpen ? 'calc(100% - 450px)' : '100%'
+          }}
+        >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
@@ -631,7 +667,18 @@ export const TourDetailsPage: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+          </Tabs>
+        </div>
+
+        {/* AI Chat Sidebar */}
+        {isChatOpen && tourId && (
+          <div
+            className="w-[450px] transition-all duration-300 ease-in-out border-l pl-6"
+          >
+            <AIChat tourId={parseInt(tourId)} onScheduleUpdate={handleScheduleUpdate} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
