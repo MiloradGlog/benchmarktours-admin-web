@@ -12,7 +12,8 @@ import {
   X,
   Star,
   ClipboardList,
-  UserCog
+  UserCog,
+  Bot
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -28,6 +29,7 @@ export const Layout: React.FC = () => {
     { name: 'Account Requests', href: '/account-requests', icon: UserCog },
     { name: 'Reviews', href: '/reviews', icon: Star },
     { name: 'Surveys', href: '/surveys', icon: ClipboardList },
+    { name: 'AI Assistant', href: '/ai-assistant', icon: Bot },
   ];
 
   const handleLogout = () => {

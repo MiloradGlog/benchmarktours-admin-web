@@ -23,6 +23,7 @@ import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from '@/pages/TermsOfServicePage';
 import { SupportPage } from '@/pages/SupportPage';
 import { AccountDeletionRequestPage } from '@/pages/AccountDeletionRequestPage';
+import { AIAssistantPage } from '@/pages/AIAssistantPage';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
             <Route path="surveys/edit/:id" element={<SurveyBuilderPage />} />
             <Route path="surveys/view/:id" element={<SurveyViewPage />} />
             <Route path="surveys/:id/responses" element={<SurveyResponsesPage />} />
+            <Route path="ai-assistant" element={<AIAssistantPage />} />
             <Route path="" element={<Navigate to="/dashboard" replace />} />
           </Route>
         </Routes>

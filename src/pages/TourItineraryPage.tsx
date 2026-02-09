@@ -118,32 +118,32 @@ export const TourItineraryPage: React.FC = () => {
       </div>
 
 {viewMode === 'calendar' && (
-        <div className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg">
-          💡 <strong>Tip:</strong> Click and drag on the calendar to create new activities, drag existing activities to reschedule them
-        </div>
-      )}
+            <div className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg mb-6">
+              💡 <strong>Tip:</strong> Click and drag on the calendar to create new activities, drag existing activities to reschedule them
+            </div>
+          )}
 
-      {viewMode === 'calendar' ? (
-        <CalendarItinerary
-          activities={activities}
-          companies={companies}
-          tourStartDate={tour.start_date}
-          tourEndDate={tour.end_date}
-          onActivityCreate={handleActivityCreate}
-          onActivityUpdate={handleActivityUpdate}
-          onActivityDelete={handleActivityDelete}
-        />
-      ) : (
-        <div className="text-center py-12 text-gray-500">
-          <p>List view is not implemented yet. Please use Calendar view.</p>
-          <Button 
-            onClick={() => setViewMode('calendar')} 
-            className="mt-4"
-          >
-            Switch to Calendar View
-          </Button>
-        </div>
-      )}
+          {viewMode === 'calendar' ? (
+            <CalendarItinerary
+              activities={activities}
+              companies={companies}
+              tourStartDate={tour.start_date}
+              tourEndDate={tour.end_date}
+              onActivityCreate={handleActivityCreate}
+              onActivityUpdate={handleActivityUpdate}
+              onActivityDelete={handleActivityDelete}
+            />
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p>List view is not implemented yet. Please use Calendar view.</p>
+              <Button
+                onClick={() => setViewMode('calendar')}
+                className="mt-4"
+              >
+                Switch to Calendar View
+              </Button>
+            </div>
+          )}
 
       {activities.length === 0 && viewMode === 'calendar' && (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
