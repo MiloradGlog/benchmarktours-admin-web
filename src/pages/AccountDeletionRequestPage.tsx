@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -16,6 +16,14 @@ export const AccountDeletionRequestPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const previousTitle = document.title;
+    document.title = 'Japan Lean Experience — Request Account & Data Deletion | Slavuj';
+    return () => {
+      document.title = previousTitle;
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,8 +65,9 @@ export const AccountDeletionRequestPage: React.FC = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Request Submitted</h2>
             <p className="text-gray-600 mb-6">
-              Your account deletion request has been submitted successfully.
-              An administrator will review your request and contact you shortly.
+              Your deletion request for your Japan Lean Experience account has been submitted
+              successfully. An administrator from Slavuj will review your request and contact you
+              shortly.
             </p>
             <p className="text-sm text-gray-500 mb-4">
               Processing typically takes 24-48 hours.
@@ -77,8 +86,22 @@ export const AccountDeletionRequestPage: React.FC = () => {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Request Account Deletion</h1>
-          <p className="text-gray-600">Submit a request to delete your JLE account</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Japan Lean Experience — Request Account & Data Deletion
+          </h1>
+          <p className="text-gray-600">
+            Submit a request to delete your Japan Lean Experience (JLE) account and associated data.
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            App: <strong>Japan Lean Experience</strong> (com.japanleanexperience.mobile) · Developer: <strong>Slavuj</strong>
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Support contact:{' '}
+            <a href="mailto:milorad@slavuj.dev?subject=Japan%20Lean%20Experience%20-%20Account%20Deletion%20Request"
+               className="text-blue-600 hover:underline">
+              milorad@slavuj.dev
+            </a>
+          </p>
         </div>
 
         {/* Information Card */}
@@ -117,11 +140,11 @@ export const AccountDeletionRequestPage: React.FC = () => {
               <ul className="space-y-2 text-gray-600">
                 <li className="flex items-start gap-2">
                   <ChevronRight className="h-4 w-4 mt-0.5 text-gray-400" />
-                  <span>Your profile and all personal information</span>
+                  <span>Your Japan Lean Experience profile and all personal information (name, email, account metadata)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ChevronRight className="h-4 w-4 mt-0.5 text-gray-400" />
-                  <span>Access to all tours and activities</span>
+                  <span>Access to all tours and activities within the app</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ChevronRight className="h-4 w-4 mt-0.5 text-gray-400" />
@@ -134,12 +157,38 @@ export const AccountDeletionRequestPage: React.FC = () => {
               </ul>
             </div>
 
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">Data retention</h3>
+              <p className="text-gray-600">
+                A limited subset of data (such as transaction records, audit logs, and communications)
+                may be retained for up to 90 days after deletion where required by law, for fraud
+                prevention, or for legitimate business purposes. All other personal data associated
+                with your Japan Lean Experience account is permanently removed upon request approval.
+              </p>
+            </div>
+
             <Alert className="border-yellow-200 bg-yellow-50">
               <AlertTriangle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
                 <strong>Important:</strong> Account deletion is permanent and irreversible. All your data will be permanently removed from our systems.
               </AlertDescription>
             </Alert>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">Alternative: request deletion by email</h3>
+              <p className="text-gray-600">
+                If you prefer, you can also request deletion of your Japan Lean Experience account by
+                emailing{' '}
+                <a
+                  href="mailto:milorad@slavuj.dev?subject=Japan%20Lean%20Experience%20-%20Account%20Deletion%20Request"
+                  className="text-blue-600 hover:underline"
+                >
+                  milorad@slavuj.dev
+                </a>{' '}
+                from the address registered to your account. Slavuj (the developer of Japan Lean
+                Experience) will process your request within 24–48 hours.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -164,7 +213,7 @@ export const AccountDeletionRequestPage: React.FC = () => {
                   placeholder="Enter your account email"
                 />
                 <p className="text-sm text-gray-500">
-                  The email address associated with your JLE account
+                  The email address associated with your Japan Lean Experience account
                 </p>
               </div>
 
