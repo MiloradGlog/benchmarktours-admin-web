@@ -1,6 +1,6 @@
 **Privacy Policy**
 
-This privacy policy applies to the Japan Lean Experience app (hereby referred to as "Application") for mobile devices that was created by Makoto Investments (hereby referred to as "Service Provider") as a Commercial service. This service is intended for use "AS IS".
+This privacy policy applies to the Japan Lean Experience app (hereby referred to as "Application") for mobile devices that was created by Makoto Investments (hereby referred to as "Service Provider") as a Commercial service. The Application is developed and published on Google Play by Slavuj on behalf of Makoto Investments. This service is intended for use "AS IS".
 
 **Information Collection and Use**
 
