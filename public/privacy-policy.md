@@ -11,13 +11,7 @@ The Application collects information when you download and use it. This informat
 *   The time spent on the Application
 *   The operating system you use on your mobile device
 
-The Application does not gather precise information about the location of your mobile device.
-
-The Application collects your device's location, which helps the Service Provider determine your approximate geographical location and make use of in below ways:
-
-*   Geolocation Services: The Service Provider utilizes location data to provide features such as personalized content, relevant recommendations, and location-based services.
-*   Analytics and Improvements: Aggregated and anonymized location data helps the Service Provider to analyze user behavior, identify trends, and improve the overall performance and functionality of the Application.
-*   Third-Party Services: Periodically, the Service Provider may transmit anonymized location data to external services. These services assist them in enhancing the Application and optimizing their offerings.
+The Application does not access, collect, or store your device's location. The Application does not request any location permissions (such as ACCESS_FINE_LOCATION or ACCESS_COARSE_LOCATION on Android, or NSLocationWhenInUseUsageDescription on iOS). Addresses shown within the Application (for example, for tour activities, restaurants, or hotels) are static content entered by administrators; tapping them opens your device's default Maps application, which is governed by that application's own privacy policy.
 
 The Service Provider may use the information you provided to contact you from time to time to provide you with important information, required notices and marketing promotions.
 
